@@ -1,0 +1,31 @@
+# CLI Command Assistant Configuration
+# Copy this file to ~/.cli-assistant/config.yaml and customize as needed
+
+# Skip confirmation prompts before executing commands
+autoexecute: false
+
+# Maximum number of commands that can run concurrently (1-20)
+maxconcurrent: 5
+
+# Maximum number of commands to store in history (1-10000)
+historysize: 1000
+
+# Require explicit confirmation before executing dangerous commands
+confirmdangerous: true
+
+# Enable clipboard functionality (requires xclip or xsel)
+clipboardenabled: true
+
+# Enable LLM-powered command generation using OpenAI's GPT
+# When enabled, provides better natural language understanding
+# Falls back to pattern-based generation if API is unavailable
+usellm: true
+
+# OpenAI API key for LLM mode
+# Get your key from: https://platform.openai.com/api-keys
+# Alternatively, set the OPENAI_API_KEY environment variable
+openaiapikey: "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"
+
+# Example with LLM enabled:
+# usellm: true
+# openaiapikey: "sk-your-api-key-here"

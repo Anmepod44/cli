@@ -1,0 +1,51 @@
+name: cli-command-assistant
+base: core22
+version: '1.0.0'
+summary: Natural Language Linux Command Generator
+description: |
+  CLI Command Assistant is a lightweight yet powerful terminal application
+  that bridges the gap between natural language instructions and Linux shell
+  commands. Simply describe what you want to do in plain English, and the
+  assistant will generate the corresponding command for you.
+  
+  Features:
+  - Natural language to Linux command translation
+  - AI-powered mode with OpenAI GPT integration (optional)
+  - Pattern-based mode for offline use
+  - Command safety validation and warnings
+  - Interactive interface with command review
+  - Command history with search
+  - Concurrent command execution
+  - Clipboard integration
+  
+  Get started:
+    1. Run: cli-command-assistant
+    2. Follow the setup prompts
+    3. Start generating commands!
+
+grade: stable
+confinement: strict
+
+apps:
+  cli-command-assistant:
+    command: bin/cli-assistant
+    plugs:
+      - home
+      - network
+      - network-bind
+      - removable-media
+    environment:
+      HOME: $SNAP_USER_COMMON
+
+parts:
+  cli-assistant:
+    plugin: go
+    source: .
+    build-snaps:
+      - go/1.22/stable
+    build-packages:
+      - gcc
+    override-build: |
+      go build -o $SNAPCRAFT_PART_INSTALL/bin/cli-assistant ./cmd/cli-assistant
+    stage-packages:
+      - xclip
