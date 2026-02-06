@@ -1,0 +1,99 @@
+# Binaries
+cli-assistant
+cli-assistant-test
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binaries
+*.test
+
+# Output of the go coverage tool
+*.out
+
+# Go workspace file
+go.work
+
+# Build artifacts
+build/
+dist/
+*.deb
+*.snap
+*.rpm
+*.tar.gz
+
+# Configuration files with sensitive data
+config.yaml
+.env
+.env.local
+.env.*.local
+
+# User configuration directory (contains API keys)
+.cli-assistant/
+**/.cli-assistant/
+
+# API keys and secrets
+**/config.yaml
+**/*_key
+**/*_secret
+**/*.key
+**/*.pem
+
+# Environment files
+.envrc
+.env.development
+.env.production
+.env.test
+
+# Logs
+*.log
+logs/
+**/*.log
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Test files
+test_*.go
+*_test_output.txt
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Coverage reports
+coverage.txt
+coverage.html
+*.coverprofile
+
+# Documentation build artifacts
+docs/_build/
+site/
+
+# Local development
+.local/
+local/
+
+# Sensitive test data
+test_data/
+fixtures/
+
+# Package manager
+vendor/
