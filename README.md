@@ -1,4 +1,4 @@
-# 🚀 CLI Command Assistant
+# CLI Command Assistant
 
 > **Transform natural language into powerful Linux commands**
 
@@ -6,7 +6,7 @@ Stop memorizing complex command syntax. Just describe what you want to do in pla
 
 ---
 
-## ✨ What is this?
+## What is this?
 
 **CLI Command Assistant** is your intelligent terminal companion that speaks your language. Whether you're a beginner learning Linux or a pro who can't remember every flag, this tool bridges the gap between what you want and how to do it.
 
@@ -19,20 +19,20 @@ Simple as that.
 
 ---
 
-## 🎯 Why You'll Love It
+## Why You'll Love It
 
 | Feature | What It Means For You |
 |---------|----------------------|
-| 🤖 **AI-Powered** | Understands complex requests like a human would |
-| ⚡ **Lightning Fast** | Pattern mode works offline, AI mode when you need it |
-| 🛡️ **Safety First** | Warns you before running dangerous commands |
-| 📚 **Learn as You Go** | See explanations for every command generated |
-| 🎨 **Beautiful Interface** | Clean, colorful, easy to read |
-| 📋 **Smart History** | Never lose a useful command again |
+| **AI-Powered** | Understands complex requests like a human would |
+| **Lightning Fast** | Pattern mode works offline, AI mode when you need it |
+| **Safety First** | Warns you before running dangerous commands |
+| **Learn as You Go** | See explanations for every command generated |
+| **Beautiful Interface** | Clean, colorful, easy to read |
+| **Smart History** | Never lose a useful command again |
 
 ---
 
-## 🎬 See It In Action
+## See It In Action
 
 ### Simple Commands
 ```bash
@@ -60,7 +60,7 @@ Simple as that.
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Install in 30 Seconds
 
@@ -88,17 +88,17 @@ Get an OpenAI API key (takes 2 minutes):
 
 ---
 
-## 💡 How It Works
+## How It Works
 
 ### Two Modes, One Goal
 
-**🎯 Pattern Mode** (Default - Always Free)
+**Pattern Mode** (Default - Always Free)
 - Works offline
 - Instant responses
 - Perfect for common commands
 - No API needed
 
-**🤖 AI Mode** (Optional - Smarter)
+**AI Mode** (Optional - Smarter)
 - Powered by ChatGPT
 - Understands complex requests
 - Learns from context
@@ -108,7 +108,7 @@ The app automatically falls back to pattern mode if AI is unavailable. Best of b
 
 ---
 
-## 🎨 Features That Make Life Easy
+## Features That Make Life Easy
 
 ### Safety Warnings
 ```
@@ -137,7 +137,7 @@ Recent Commands:
 
 ---
 
-## 📦 Installation Options
+## Installation Options
 
 ### Quick Run (No Installation)
 ```bash
@@ -165,7 +165,7 @@ sudo snap install cli-command-assistant_*.snap --dangerous
 
 ---
 
-## ⚙️ Configuration
+## Configuration
 
 Edit `~/.cli-assistant/config.yaml`:
 
@@ -187,7 +187,7 @@ clipboardenabled: true    # Copy to clipboard support
 
 ---
 
-## 🎓 Examples
+## Examples
 
 ### File Operations
 ```
@@ -221,16 +221,15 @@ clipboardenabled: true    # Copy to clipboard support
 
 ---
 
-## 🛠️ Built With
+## Built With
 
 - **Go 1.22** - Fast, concurrent, reliable
 - **OpenAI GPT-3.5** - Natural language understanding
 - **Pattern Matching** - Offline command generation
-- **Love** ❤️ - For making terminals friendly
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 Found a bug? Have an idea? Contributions are welcome!
 
@@ -242,42 +241,41 @@ Found a bug? Have an idea? Contributions are welcome!
 
 ---
 
-## 📄 License
+## License
 
 MIT License - Use it, modify it, share it!
 
 ---
 
-## 🌟 Show Your Support
+## Show Your Support
 
-If this tool makes your life easier, give it a ⭐ on GitHub!
-
----
-
-## 💬 Need Help?
-
-- 📖 [Quick Start Guide](QUICKSTART.md)
-- 🔑 [OpenAI Setup Guide](docs/OPENAI_SETUP.md)
-- 📋 [Installation Guide](INSTALLATION.md)
-- ⚡ [Quick Reference](QUICK_REFERENCE.md)
+If this tool makes your life easier, give it a star on GitHub!
 
 ---
 
-## 🎯 Perfect For
+## Need Help?
 
-- 🎓 **Students** learning Linux
-- 👨‍💻 **Developers** who forget syntax
-- 🔧 **System Admins** managing servers
-- 🚀 **DevOps Engineers** automating tasks
-- 🆕 **Linux Beginners** getting started
-- 🧙 **Terminal Wizards** saving time
+- Run `./setup.sh` for interactive setup
+- Check `~/.cli-assistant/errors.log` for debugging
+- Open an issue on GitHub for support
+
+---
+
+## Perfect For
+
+- **Students** learning Linux
+- **Developers** who forget syntax
+- **System Admins** managing servers
+- **DevOps Engineers** automating tasks
+- **Linux Beginners** getting started
+- **Terminal Users** saving time
 
 ---
 
 <div align="center">
 
-**Made with ❤️ for the command line**
+**Made with care for the command line**
 
-[Get Started](#-quick-start) • [Documentation](QUICKSTART.md) • [Report Bug](https://github.com/yourusername/cli-command-assistant/issues)
+[Get Started](#quick-start) • [Report Bug](https://github.com/yourusername/cli-command-assistant/issues)
 
 </div>
