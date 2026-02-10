@@ -42,19 +42,56 @@ function __cli_assistant_ask {
         
         case "$response" in
             [Yy]|"")
+                # Execute and capture exit code
                 eval "$result"
+                local exit_code=$?
+                
+                # Provide feedback based on exit code
+                if [ $exit_code -eq 0 ]; then
+                    echo -e "\033[1;32m✓ Command completed successfully\033[0m"
+                elif [ $exit_code -eq 127 ]; then
+                    echo -e "\033[1;31m✗ Command failed: Command not found\033[0m"
+                    echo -e "\033[1;33mTip: The command may need to be installed or isn't in your PATH\033[0m"
+                    echo -e "\033[1;36mTry asking: ask how to install ${result%% *}\033[0m"
+                elif [ $exit_code -eq 126 ]; then
+                    echo -e "\033[1;31m✗ Command failed: Permission denied\033[0m"
+                    echo -e "\033[1;33mTip: You may need to run with sudo or check file permissions\033[0m"
+                elif [ $exit_code -eq 130 ]; then
+                    echo -e "\033[1;33m⚠ Command interrupted (Ctrl+C)\033[0m"
+                elif [ $exit_code -gt 128 ]; then
+                    echo -e "\033[1;31m✗ Command terminated by signal (exit code: $exit_code)\033[0m"
+                else
+                    echo -e "\033[1;31m✗ Command failed with exit code: $exit_code\033[0m"
+                    echo -e "\033[1;33mTip: Check the error message above for details\033[0m"
+                fi
+                
+                return $exit_code
                 ;;
             [Ee])
                 # Allow editing
                 read -e -i "$result" -p "$(echo -e '\033[1;32mEdit:\033[0m ')" edited_cmd
+                
+                # Execute edited command and capture exit code
                 eval "$edited_cmd"
+                local exit_code=$?
+                
+                # Provide feedback
+                if [ $exit_code -eq 0 ]; then
+                    echo -e "\033[1;32m✓ Command completed successfully\033[0m"
+                else
+                    echo -e "\033[1;31m✗ Command failed with exit code: $exit_code\033[0m"
+                fi
+                
+                return $exit_code
                 ;;
             *)
                 echo "Command cancelled."
+                return 0
                 ;;
         esac
     else
         echo "Could not generate command. Try: cli-assistant"
+        return 1
     fi
 }
 

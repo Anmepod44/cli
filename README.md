@@ -26,9 +26,10 @@ Simple as that.
 | **AI-Powered** | Understands complex requests like a human would |
 | **Lightning Fast** | Pattern mode works offline, AI mode when you need it |
 | **Safety First** | Warns you before running dangerous commands |
+| **Smart Error Detection** | Detects failures and suggests fixes automatically |
 | **Learn as You Go** | See explanations for every command generated |
 | **Modern Interface** | Contemporary colors, smooth animations, beautiful design |
-| **Shell Integration** | Use `?` directly in your terminal for instant help |
+| **Shell Integration** | Use `ask` directly in your terminal for instant help |
 | **Smart History** | Never lose a useful command again |
 
 ---
@@ -144,6 +145,22 @@ The app automatically falls back to pattern mode if AI is unavailable. Best of b
 ---
 
 ## Features That Make Life Easy
+
+### Intelligent Error Handling
+```
+$ ask play music
+→ mpg123 music.mp3
+Run this command? [Y/n/e(dit)]: y
+✗ Command failed: Command not found
+Tip: The command may need to be installed or isn't in your PATH
+Try asking: ask how to install mpg123
+```
+
+The `ask` command detects failures and provides:
+- ✓ Success/failure indicators with color coding
+- ✓ Contextual tips based on error type
+- ✓ Suggestions for next steps
+- ✓ Exit code information
 
 ### Safety Warnings
 ```
