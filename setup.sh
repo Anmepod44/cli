@@ -1,72 +1,169 @@
 #!/bin/bash
 
-# CLI Command Assistant Setup Script
+# CLI Command Assistant - Interactive Setup Script
+# This script helps you configure the application quickly
 
 set -e
 
-echo "╔════════════════════════════════════════════════════════════╗"
-echo "║     CLI Command Assistant - Setup                          ║"
-echo "╚════════════════════════════════════════════════════════════╝"
-echo ""
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+MAGENTA='\033[0;35m'
+NC='\033[0m' # No Color
+BOLD='\033[1m'
 
-# Create config directory
-CONFIG_DIR="$HOME/.cli-assistant"
-CONFIG_FILE="$CONFIG_DIR/config.yaml"
+# Configuration
+APP_DIR="$HOME/.cli-assistant"
+CONFIG_FILE="$APP_DIR/config.yaml"
 
-echo "Creating configuration directory..."
-mkdir -p "$CONFIG_DIR"
+# Print colored output
+print_header() {
+    echo -e "${CYAN}${BOLD}"
+    echo "┌─────────────────────────────────────────────────────────────┐"
+    echo "│         CLI Command Assistant - Setup Wizard               │"
+    echo "└─────────────────────────────────────────────────────────────┘"
+    echo -e "${NC}"
+}
 
-# Check if config already exists
-if [ -f "$CONFIG_FILE" ]; then
-    echo "⚠ Configuration file already exists at: $CONFIG_FILE"
-    read -p "Do you want to overwrite it? (y/N): " -n 1 -r
-    echo
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        echo "Setup cancelled. Existing configuration preserved."
-        exit 0
+print_success() {
+    echo -e "${GREEN}✓${NC} $1"
+}
+
+print_error() {
+    echo -e "${RED}✗${NC} $1"
+}
+
+print_info() {
+    echo -e "${BLUE}ℹ${NC} $1"
+}
+
+print_warning() {
+    echo -e "${YELLOW}⚠${NC} $1"
+}
+
+print_step() {
+    echo -e "${MAGENTA}●${NC} ${BOLD}$1${NC}"
+}
+
+# Check if running on Linux
+check_os() {
+    if [[ "$OSTYPE" != "linux-gnu"* ]]; then
+        print_warning "This tool is designed for Linux. Some features may not work on other systems."
+        read -p "Continue anyway? (y/n): " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            exit 1
+        fi
     fi
-fi
+}
 
-# Ask about LLM mode
-echo ""
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "LLM Mode Configuration"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo ""
-echo "The CLI Assistant can work in two modes:"
-echo "  1. Pattern-based (default) - Fast, offline, rule-based"
-echo "  2. LLM-powered - AI understanding using OpenAI GPT"
-echo ""
-read -p "Do you want to enable LLM mode? (y/N): " -n 1 -r
-echo
-
-USE_LLM=false
-API_KEY=""
-
-if [[ $REPLY =~ ^[Yy]$ ]]; then
-    USE_LLM=true
-    echo ""
-    echo "To use LLM mode, you need an OpenAI API key."
-    echo "Get one at: https://platform.openai.com/api-keys"
-    echo ""
-    read -p "Enter your OpenAI API key (or press Enter to skip): " API_KEY
+# Check dependencies
+check_dependencies() {
+    print_step "Checking dependencies..."
     
-    if [ -z "$API_KEY" ]; then
-        echo ""
-        echo "ℹ No API key provided. You can add it later by:"
-        echo "  1. Editing $CONFIG_FILE"
-        echo "  2. Or setting OPENAI_API_KEY environment variable"
-        echo ""
+    # Check for Go
+    if ! command -v go &> /dev/null; then
+        print_error "Go is not installed. Please install Go 1.22 or later."
+        print_info "Visit: https://golang.org/doc/install"
+        exit 1
     fi
-fi
+    print_success "Go is installed ($(go version))"
+    
+    # Check for make
+    if ! command -v make &> /dev/null; then
+        print_error "Make is not installed. Please install it:"
+        print_info "Ubuntu/Debian: sudo apt install build-essential"
+        print_info "Fedora/RHEL: sudo dnf install make"
+        exit 1
+    fi
+    print_success "Make is installed"
+    
+    # Check for optional clipboard tools
+    if command -v xclip &> /dev/null || command -v xsel &> /dev/null; then
+        print_success "Clipboard support available"
+    else
+        print_warning "Clipboard tools not found. Install xclip for clipboard support:"
+        print_info "  sudo apt install xclip"
+    fi
+    
+    echo
+}
 
-# Create configuration file
-echo ""
-echo "Creating configuration file..."
+# Create configuration directory
+create_config_dir() {
+    print_step "Setting up configuration directory..."
+    
+    if [ ! -d "$APP_DIR" ]; then
+        mkdir -p "$APP_DIR"
+        print_success "Created directory: $APP_DIR"
+    else
+        print_info "Directory already exists: $APP_DIR"
+    fi
+    echo
+}
 
-cat > "$CONFIG_FILE" << EOF
+# Interactive configuration
+configure_app() {
+    print_step "Configuration Setup"
+    echo
+    
+    # Ask about LLM mode
+    echo -e "${BOLD}Do you want to enable AI-powered command generation?${NC}"
+    echo "  • AI Mode: Uses OpenAI GPT for better understanding (requires API key)"
+    echo "  • Pattern Mode: Works offline with rule-based matching (free)"
+    echo
+    read -p "Enable AI mode? (y/n) [n]: " enable_llm
+    enable_llm=${enable_llm:-n}
+    
+    local use_llm="false"
+    local api_key=""
+    
+    if [[ $enable_llm =~ ^[Yy]$ ]]; then
+        use_llm="true"
+        echo
+        echo -e "${BOLD}OpenAI API Key Setup${NC}"
+        echo "Get your API key from: ${CYAN}https://platform.openai.com/api-keys${NC}"
+        echo "Cost: ~\$0.001 per command (~\$1-5/month for typical use)"
+        echo
+        read -p "Enter your OpenAI API key (or press Enter to skip): " api_key
+        
+        if [ -z "$api_key" ]; then
+            print_warning "No API key provided. You can add it later in $CONFIG_FILE"
+            api_key="your-api-key-here"
+        else
+            print_success "API key configured"
+        fi
+    fi
+    
+    echo
+    
+    # Ask about dangerous command confirmation
+    echo -e "${BOLD}Safety Settings${NC}"
+    read -p "Require confirmation before executing dangerous commands? (y/n) [y]: " confirm_dangerous
+    confirm_dangerous=${confirm_dangerous:-y}
+    local confirm_dangerous_bool="true"
+    [[ ! $confirm_dangerous =~ ^[Yy]$ ]] && confirm_dangerous_bool="false"
+    
+    echo
+    
+    # Ask about clipboard
+    echo -e "${BOLD}Clipboard Settings${NC}"
+    read -p "Enable clipboard support? (y/n) [y]: " enable_clipboard
+    enable_clipboard=${enable_clipboard:-y}
+    local clipboard_bool="true"
+    [[ ! $enable_clipboard =~ ^[Yy]$ ]] && clipboard_bool="false"
+    
+    echo
+    
+    # Create config file
+    print_step "Writing configuration..."
+    
+    cat > "$CONFIG_FILE" << EOF
 # CLI Command Assistant Configuration
-# Generated on $(date)
+# Generated by setup wizard on $(date)
 
 # Skip confirmation prompts before executing commands
 autoexecute: false
@@ -78,63 +175,173 @@ maxconcurrent: 5
 historysize: 1000
 
 # Require explicit confirmation before executing dangerous commands
-confirmdangerous: true
+confirmdangerous: $confirm_dangerous_bool
 
 # Enable clipboard functionality (requires xclip or xsel)
-clipboardenabled: true
+clipboardenabled: $clipboard_bool
 
 # Enable LLM-powered command generation using OpenAI's GPT
-usellm: $USE_LLM
+# When enabled, provides better natural language understanding
+# Falls back to pattern-based generation if API is unavailable
+usellm: $use_llm
 
 # OpenAI API key for LLM mode
-openaiapikey: "$API_KEY"
+# Get your key from: https://platform.openai.com/api-keys
+# Alternatively, set the OPENAI_API_KEY environment variable
+openaiapikey: "$api_key"
 EOF
-
-echo "✓ Configuration file created at: $CONFIG_FILE"
-
-# Check for clipboard tools
-echo ""
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "Clipboard Support"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo ""
-
-if command -v xclip &> /dev/null; then
-    echo "✓ xclip is installed"
-elif command -v xsel &> /dev/null; then
-    echo "✓ xsel is installed"
-else
-    echo "⚠ No clipboard tool found (xclip or xsel)"
-    echo ""
-    read -p "Do you want to install xclip? (y/N): " -n 1 -r
+    
+    print_success "Configuration saved to: $CONFIG_FILE"
     echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        echo "Installing xclip..."
-        sudo apt-get update && sudo apt-get install -y xclip
-        echo "✓ xclip installed"
-    else
-        echo "ℹ You can install it later with: sudo apt install xclip"
-    fi
-fi
+}
 
-# Summary
-echo ""
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "Setup Complete!"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo ""
-echo "Configuration:"
-echo "  Location: $CONFIG_FILE"
-echo "  LLM Mode: $USE_LLM"
-if [ "$USE_LLM" = true ] && [ -n "$API_KEY" ]; then
-    echo "  API Key: Configured ✓"
-elif [ "$USE_LLM" = true ]; then
-    echo "  API Key: Not configured (will use OPENAI_API_KEY env var)"
-fi
-echo ""
-echo "Next steps:"
-echo "  1. Build the application: go build ./cmd/cli-assistant"
-echo "  2. Run it: ./cli-assistant"
-echo ""
-echo "To modify configuration later, edit: $CONFIG_FILE"
-echo ""
+# Build the application
+build_app() {
+    print_step "Building application..."
+    
+    if make build; then
+        print_success "Build completed successfully"
+    else
+        print_error "Build failed"
+        exit 1
+    fi
+    echo
+}
+
+# Install system-wide
+install_system_wide() {
+    print_step "Installation Options"
+    echo
+    echo "Choose installation method:"
+    echo "  1. System-wide (requires sudo) - Available from anywhere"
+    echo "  2. Local only - Run from current directory"
+    echo
+    read -p "Choice (1/2) [1]: " install_choice
+    install_choice=${install_choice:-1}
+    
+    if [ "$install_choice" = "1" ]; then
+        echo
+        print_info "Installing to /usr/local/bin (requires sudo)..."
+        if sudo make install; then
+            print_success "Installed system-wide"
+            print_info "You can now run: cli-assistant"
+        else
+            print_error "Installation failed"
+            print_info "You can still run: ./cli-assistant"
+        fi
+    else
+        print_info "Skipping system-wide installation"
+        print_info "Run the app with: ./cli-assistant"
+    fi
+    echo
+}
+
+# Setup shell integration
+setup_shell_integration() {
+    print_step "Shell Integration Setup"
+    echo
+    echo "Shell integration allows you to use '?' directly in your terminal:"
+    echo "  ${CYAN}$ ? list all files${NC}"
+    echo "  ${CYAN}→ ls -la${NC}"
+    echo
+    read -p "Enable shell integration? (y/n) [y]: " enable_shell
+    enable_shell=${enable_shell:-y}
+    
+    if [[ $enable_shell =~ ^[Yy]$ ]]; then
+        local shell_rc=""
+        
+        # Detect shell
+        if [ -n "$BASH_VERSION" ]; then
+            shell_rc="$HOME/.bashrc"
+        elif [ -n "$ZSH_VERSION" ]; then
+            shell_rc="$HOME/.zshrc"
+        else
+            echo "Detected shell: $SHELL"
+            read -p "Enter path to your shell RC file (e.g., ~/.bashrc): " shell_rc
+        fi
+        
+        if [ -f "$shell_rc" ]; then
+            # Check if already added
+            if grep -q "CLI Command Assistant Shell Integration" "$shell_rc"; then
+                print_info "Shell integration already configured in $shell_rc"
+            else
+                echo "" >> "$shell_rc"
+                echo "# CLI Command Assistant Shell Integration" >> "$shell_rc"
+                echo "source $(pwd)/shell-integration.sh" >> "$shell_rc"
+                print_success "Added shell integration to $shell_rc"
+                print_info "Reload your shell: source $shell_rc"
+            fi
+        else
+            print_warning "Shell RC file not found: $shell_rc"
+            print_info "Manually add this line to your shell RC file:"
+            echo "  source $(pwd)/shell-integration.sh"
+        fi
+    else
+        print_info "Skipping shell integration"
+    fi
+    echo
+}
+
+# Final instructions
+print_final_instructions() {
+    echo -e "${GREEN}${BOLD}"
+    echo "┌─────────────────────────────────────────────────────────────┐"
+    echo "│                    Setup Complete! 🎉                       │"
+    echo "└─────────────────────────────────────────────────────────────┘"
+    echo -e "${NC}"
+    
+    echo -e "${BOLD}Quick Start:${NC}"
+    echo
+    
+    if command -v cli-assistant &> /dev/null; then
+        echo "  ${CYAN}cli-assistant${NC}                    # Start interactive mode"
+    else
+        echo "  ${CYAN}./cli-assistant${NC}                  # Start interactive mode"
+    fi
+    
+    echo "  ${CYAN}? list all files${NC}                # Use shell integration"
+    echo "  ${CYAN}? show disk usage${NC}               # Quick command generation"
+    echo
+    
+    echo -e "${BOLD}Configuration:${NC}"
+    echo "  Edit: ${CYAN}$CONFIG_FILE${NC}"
+    echo
+    
+    echo -e "${BOLD}Examples:${NC}"
+    echo "  • list all files"
+    echo "  • find files larger than 10MB"
+    echo "  • show disk usage"
+    echo "  • find process nginx"
+    echo "  • search for text in files"
+    echo
+    
+    echo -e "${BOLD}Documentation:${NC}"
+    echo "  ${CYAN}cat README.md${NC}                   # Full documentation"
+    echo
+    
+    if [ -f "$CONFIG_FILE" ]; then
+        if grep -q "your-api-key-here" "$CONFIG_FILE"; then
+            print_warning "Remember to add your OpenAI API key to: $CONFIG_FILE"
+        fi
+    fi
+    
+    echo -e "${GREEN}Happy commanding! 🚀${NC}"
+    echo
+}
+
+# Main setup flow
+main() {
+    print_header
+    
+    check_os
+    check_dependencies
+    create_config_dir
+    configure_app
+    build_app
+    install_system_wide
+    setup_shell_integration
+    print_final_instructions
+}
+
+# Run main function
+main

@@ -239,7 +239,11 @@ func (g *Generator) Generate(input string) (*types.Command, error) {
 
 			// Build command from template
 			var cmdStr string
-			if len(params) > 0 {
+
+			// Count format specifiers in template
+			formatCount := strings.Count(p.template, "%s")
+
+			if formatCount > 0 && len(params) > 0 {
 				// Handle size units for find commands
 				if strings.Contains(p.template, "find") && strings.Contains(p.template, "size") {
 					size := params[0]
@@ -256,12 +260,19 @@ func (g *Generator) Generate(input string) (*types.Command, error) {
 					}
 					cmdStr = fmt.Sprintf(p.template, size, unit)
 				} else {
-					// Standard parameter substitution
-					args := make([]interface{}, len(params))
-					for i, param := range params {
-						args[i] = param
+					// Standard parameter substitution - only use non-empty params
+					args := make([]interface{}, 0, formatCount)
+					for _, param := range params {
+						if param != "" {
+							args = append(args, param)
+						}
 					}
-					cmdStr = fmt.Sprintf(p.template, args...)
+					// Only format if we have the right number of args
+					if len(args) >= formatCount {
+						cmdStr = fmt.Sprintf(p.template, args[:formatCount]...)
+					} else {
+						cmdStr = p.template
+					}
 				}
 			} else {
 				cmdStr = p.template

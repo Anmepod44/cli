@@ -52,8 +52,8 @@ func (c *CLI) Start() error {
 
 	// Main loop
 	for {
-		// Display prompt
-		fmt.Print("\n> ")
+		// Display modern prompt
+		color.New(color.FgHiMagenta, color.Bold).Print("→ ")
 
 		// Read input
 		input, err := c.reader.ReadString('\n')
@@ -75,14 +75,14 @@ func (c *CLI) Start() error {
 
 		// Check for exit commands
 		if input == "exit" || input == "quit" {
-			fmt.Println("\nGoodbye!")
+			color.New(color.FgHiCyan).Println("\nGoodbye!")
 			return nil
 		}
 
 		// Generate command with loading animation
 		cmd, err := c.generateWithAnimation(input)
 		if err != nil {
-			color.Red("✗ Error: %v", err)
+			color.New(color.FgHiRed, color.Bold).Printf("✗ Error: %v\n", err)
 			c.logger.LogError("command generation", err)
 			continue
 		}
@@ -119,53 +119,76 @@ func (c *CLI) Start() error {
 
 // displayWelcome shows the welcome message
 func (c *CLI) displayWelcome() {
-	color.Cyan("╔════════════════════════════════════════════════════════════╗")
-	color.Cyan("║         CLI Command Assistant - Natural Language           ║")
-	color.Cyan("║              Linux Command Generator                       ║")
-	color.Cyan("╚════════════════════════════════════════════════════════════╝")
+	// Modern gradient-style header with box drawing
+	cyan := color.New(color.FgCyan, color.Bold)
+	magenta := color.New(color.FgMagenta, color.Bold)
+
+	cyan.Println("┌─────────────────────────────────────────────────────────────┐")
+	cyan.Print("│ ")
+	magenta.Print("CLI Command Assistant")
+	cyan.Println("                                │")
+	cyan.Print("│ ")
+	color.New(color.FgHiWhite).Print("Natural Language → Linux Commands")
+	cyan.Println("                     │")
+	cyan.Println("└─────────────────────────────────────────────────────────────┘")
 	fmt.Println()
 
-	// Show generation mode
+	// Show generation mode with modern icons
 	if c.config.UseLLM {
-		color.Green("🤖 AI Mode: Using LLM-powered command generation")
+		color.New(color.FgHiGreen, color.Bold).Print("● ")
+		color.HiWhite("AI Mode: LLM-powered command generation")
 	} else {
-		color.Yellow("📋 Pattern Mode: Using rule-based command generation")
-		color.Blue("   Tip: Enable LLM mode in config for better understanding")
+		color.New(color.FgHiYellow, color.Bold).Print("● ")
+		color.HiWhite("Pattern Mode: Rule-based command generation")
+		color.New(color.FgHiBlack).Println("  → Enable LLM mode in config for better understanding")
 	}
 	fmt.Println()
 
-	fmt.Println("Welcome! Describe what you want to do in plain English.")
+	color.New(color.FgHiWhite).Println("Describe what you want to do in plain English.")
 	fmt.Println()
-	color.Yellow("Examples:")
-	fmt.Println("  • list all files")
-	fmt.Println("  • find files larger than 10MB")
-	fmt.Println("  • show disk usage")
-	fmt.Println("  • find process nginx")
+
+	color.New(color.FgHiCyan, color.Bold).Println("Examples:")
+	color.New(color.FgHiBlack).Println("  ▸ list all files")
+	color.New(color.FgHiBlack).Println("  ▸ find files larger than 10MB")
+	color.New(color.FgHiBlack).Println("  ▸ show disk usage")
+	color.New(color.FgHiBlack).Println("  ▸ find process nginx")
 	fmt.Println()
-	color.Yellow("Special commands:")
-	fmt.Println("  • help or ? - Show this help message")
-	fmt.Println("  • history - Show command history")
-	fmt.Println("  • exit or quit - Exit the application")
+
+	color.New(color.FgHiMagenta, color.Bold).Println("Commands:")
+	color.New(color.FgHiBlack).Println("  ▸ help or ? - Show this help")
+	color.New(color.FgHiBlack).Println("  ▸ history - Show command history")
+	color.New(color.FgHiBlack).Println("  ▸ exit or quit - Exit")
 	fmt.Println()
 }
 
 // DisplayCommand shows a generated command with formatting
 func (c *CLI) DisplayCommand(cmd *types.Command) {
 	fmt.Println()
-	color.Green("Generated Command:")
-	color.Cyan("  %s", cmd.Raw)
+
+	// Modern command display with gradient-style colors
+	color.New(color.FgHiGreen, color.Bold).Print("✓ ")
+	color.New(color.FgHiWhite, color.Bold).Println("Generated Command")
+
+	// Command in a subtle box
+	color.New(color.FgHiBlack).Print("  ┌─ ")
+	color.New(color.FgHiCyan, color.Bold).Println(cmd.Raw)
+	color.New(color.FgHiBlack).Println("  └─")
 	fmt.Println()
 
 	if cmd.Description != "" {
-		color.Yellow("Description:")
-		fmt.Printf("  %s\n", cmd.Description)
+		color.New(color.FgHiMagenta, color.Bold).Print("● ")
+		color.New(color.FgHiWhite).Println("Description")
+		color.New(color.FgHiBlack).Printf("  %s\n", cmd.Description)
 		fmt.Println()
 	}
 
 	if len(cmd.Flags) > 0 {
-		color.Yellow("Flags:")
+		color.New(color.FgHiYellow, color.Bold).Print("● ")
+		color.New(color.FgHiWhite).Println("Flags")
 		for _, flag := range cmd.Flags {
-			fmt.Printf("  %s - %s\n", flag.Name, flag.Description)
+			color.New(color.FgHiBlack).Printf("  ▸ ")
+			color.New(color.FgHiCyan).Printf("%s", flag.Name)
+			color.New(color.FgHiBlack).Printf(" - %s\n", flag.Description)
 		}
 		fmt.Println()
 	}
@@ -175,21 +198,27 @@ func (c *CLI) DisplayCommand(cmd *types.Command) {
 func (c *CLI) displayWarning(warning types.Warning) {
 	switch warning.Level {
 	case types.CriticalLevel:
-		color.Red("⚠ CRITICAL: %s", warning.Message)
+		color.New(color.FgHiRed, color.Bold).Print("⚠ CRITICAL: ")
+		color.HiWhite(warning.Message)
 	case types.WarningLevelWarning:
-		color.Yellow("⚠ WARNING: %s", warning.Message)
+		color.New(color.FgHiYellow, color.Bold).Print("⚠ WARNING: ")
+		color.HiWhite(warning.Message)
 	case types.InfoLevel:
-		color.Blue("ℹ INFO: %s", warning.Message)
+		color.New(color.FgHiCyan, color.Bold).Print("ℹ INFO: ")
+		color.HiWhite(warning.Message)
 	}
 }
 
 // Prompt asks the user for input with options
 func (c *CLI) Prompt(message string, options []string) (string, error) {
-	fmt.Printf("%s\n", message)
+	color.New(color.FgHiWhite, color.Bold).Println(message)
 	for i, opt := range options {
-		fmt.Printf("  %d. %s\n", i+1, opt)
+		color.New(color.FgHiBlack).Print("  ")
+		color.New(color.FgHiCyan, color.Bold).Printf("%d", i+1)
+		color.New(color.FgHiBlack).Print(". ")
+		color.New(color.FgHiWhite).Println(opt)
 	}
-	fmt.Print("Choice: ")
+	color.New(color.FgHiMagenta, color.Bold).Print("→ ")
 
 	input, err := c.reader.ReadString('\n')
 	if err != nil {
@@ -203,13 +232,13 @@ func (c *CLI) Prompt(message string, options []string) (string, error) {
 func (c *CLI) DisplayResult(result types.ExecutionResult) {
 	fmt.Println()
 	if result.Error != nil {
-		color.Red("Command failed (exit code %d):", result.ExitCode)
-		fmt.Println(result.Output)
+		color.New(color.FgHiRed, color.Bold).Printf("✗ Command failed (exit code %d)\n", result.ExitCode)
+		color.New(color.FgHiBlack).Println(result.Output)
 	} else {
-		color.Green("Command executed successfully:")
+		color.New(color.FgHiGreen, color.Bold).Println("✓ Command executed successfully")
 		fmt.Println(result.Output)
 	}
-	color.Blue("Duration: %v", result.Duration)
+	color.New(color.FgHiBlack).Printf("Duration: %v\n", result.Duration)
 }
 
 // handleSpecialCommand handles special commands like help and history
@@ -232,24 +261,29 @@ func (c *CLI) handleSpecialCommand(input string) bool {
 func (c *CLI) displayHistory() {
 	entries, err := c.history.List(20)
 	if err != nil {
-		color.Red("Error retrieving history: %v", err)
+		color.New(color.FgHiRed, color.Bold).Printf("✗ Error retrieving history: %v\n", err)
 		return
 	}
 
 	if len(entries) == 0 {
-		fmt.Println("No command history yet.")
+		color.New(color.FgHiBlack).Println("No command history yet.")
 		return
 	}
 
 	fmt.Println()
-	color.Yellow("Recent Commands:")
+	color.New(color.FgHiCyan, color.Bold).Println("Recent Commands")
+	color.New(color.FgHiBlack).Println("───────────────")
+
 	for i, entry := range entries {
-		executed := ""
+		color.New(color.FgHiBlack).Printf("%2d. ", i+1)
+		color.New(color.FgHiWhite).Print(entry.Command.Raw)
+
 		if entry.Executed {
-			executed = color.GreenString(" [executed]")
+			color.New(color.FgHiGreen, color.Bold).Print(" ✓")
 		}
-		fmt.Printf("  %d. %s%s\n", i+1, entry.Command.Raw, executed)
-		fmt.Printf("     %s\n", entry.Timestamp.Format("2006-01-02 15:04:05"))
+		fmt.Println()
+
+		color.New(color.FgHiBlack).Printf("    %s\n", entry.Timestamp.Format("2006-01-02 15:04:05"))
 	}
 	fmt.Println()
 }
@@ -257,11 +291,24 @@ func (c *CLI) displayHistory() {
 // promptAction asks the user what to do with the command
 func (c *CLI) promptAction(cmd *types.Command) string {
 	fmt.Println()
-	color.Yellow("What would you like to do?")
-	fmt.Println("  1. Execute")
-	fmt.Println("  2. Copy to clipboard")
-	fmt.Println("  3. Discard")
-	fmt.Print("Choice (1-3): ")
+	color.New(color.FgHiWhite, color.Bold).Println("What would you like to do?")
+
+	color.New(color.FgHiBlack).Print("  ")
+	color.New(color.FgHiGreen, color.Bold).Print("1")
+	color.New(color.FgHiBlack).Print(". ")
+	color.New(color.FgHiWhite).Println("Execute")
+
+	color.New(color.FgHiBlack).Print("  ")
+	color.New(color.FgHiCyan, color.Bold).Print("2")
+	color.New(color.FgHiBlack).Print(". ")
+	color.New(color.FgHiWhite).Println("Copy to clipboard")
+
+	color.New(color.FgHiBlack).Print("  ")
+	color.New(color.FgHiRed, color.Bold).Print("3")
+	color.New(color.FgHiBlack).Print(". ")
+	color.New(color.FgHiWhite).Println("Discard")
+
+	color.New(color.FgHiMagenta, color.Bold).Print("→ ")
 
 	input, err := c.reader.ReadString('\n')
 	if err != nil {
@@ -285,17 +332,17 @@ func (c *CLI) executeCommand(cmd *types.Command) {
 	// Confirm if dangerous
 	if cmd.IsDangerous && c.config.ConfirmDangerous {
 		fmt.Print("\n")
-		color.Red("⚠ This command is potentially dangerous!")
-		fmt.Print("Are you sure you want to execute it? (yes/no): ")
+		color.New(color.FgHiRed, color.Bold).Println("⚠ This command is potentially dangerous!")
+		color.New(color.FgHiYellow).Print("Are you sure you want to execute it? (yes/no): ")
 
 		input, err := c.reader.ReadString('\n')
 		if err != nil || strings.ToLower(strings.TrimSpace(input)) != "yes" {
-			fmt.Println("Execution cancelled.")
+			color.New(color.FgHiBlack).Println("Execution cancelled.")
 			return
 		}
 	}
 
-	fmt.Println("\nExecuting command...")
+	color.New(color.FgHiCyan).Println("\nExecuting command...")
 
 	// Execute
 	resultChan := c.executor.Execute(cmd)
@@ -313,24 +360,24 @@ func (c *CLI) executeCommand(cmd *types.Command) {
 // copyCommand copies a command to clipboard
 func (c *CLI) copyCommand(cmd *types.Command) {
 	if !c.config.ClipboardEnabled {
-		fmt.Println("Clipboard is disabled in configuration.")
+		color.New(color.FgHiBlack).Println("Clipboard is disabled in configuration.")
 		return
 	}
 
 	if !c.clipboard.IsAvailable() {
-		color.Yellow("Clipboard unavailable. Install xclip with: sudo apt install xclip")
+		color.New(color.FgHiYellow).Println("Clipboard unavailable. Install xclip with: sudo apt install xclip")
 		fmt.Printf("\nCommand: %s\n", cmd.Raw)
 		return
 	}
 
 	if err := c.clipboard.Copy(cmd.Raw); err != nil {
-		color.Red("Failed to copy to clipboard: %v", err)
+		color.New(color.FgHiRed, color.Bold).Printf("✗ Failed to copy to clipboard: %v\n", err)
 		c.logger.LogError("clipboard copy", err)
 		fmt.Printf("\nCommand: %s\n", cmd.Raw)
 		return
 	}
 
-	color.Green("✓ Command copied to clipboard!")
+	color.New(color.FgHiGreen, color.Bold).Println("✓ Command copied to clipboard!")
 }
 
 // generateWithAnimation shows a loading animation while generating command
@@ -350,7 +397,7 @@ func (c *CLI) generateWithAnimation(input string) (*types.Command, error) {
 		}{cmd, err}
 	}()
 
-	// Show loading animation
+	// Modern loading animation with dots and gradient colors
 	spinners := []string{"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"}
 	messages := []string{
 		"Analyzing your request",
@@ -377,13 +424,14 @@ func (c *CLI) generateWithAnimation(input string) (*types.Command, error) {
 			return result.cmd, result.err
 
 		case <-ticker.C:
-			// Update spinner
+			// Update spinner with modern colors
 			spinner := spinners[spinnerIdx%len(spinners)]
 			message := messages[messageIdx%len(messages)]
 
+			// Create gradient effect with cyan to magenta
 			fmt.Printf("\r%s %s...",
-				color.CyanString(spinner),
-				color.YellowString(message))
+				color.New(color.FgHiCyan, color.Bold).Sprint(spinner),
+				color.New(color.FgHiWhite).Sprint(message))
 
 			spinnerIdx++
 

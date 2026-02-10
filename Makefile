@@ -21,12 +21,23 @@ install: build
 	@sudo chmod +x $(INSTALL_PATH)/$(BINARY_NAME)
 	@echo "✓ Installed to $(INSTALL_PATH)/$(BINARY_NAME)"
 	@echo ""
-	@echo "Run 'cli-assistant' to start the application"
+	@echo "Installing shell integration..."
+	@sudo cp shell-integration.sh /etc/profile.d/cli-assistant.sh
+	@sudo chmod +x /etc/profile.d/cli-assistant.sh
+	@echo "✓ Shell integration installed to /etc/profile.d/"
+	@echo ""
+	@echo "To activate the 'ask' command:"
+	@echo "  source ~/.bashrc"
+	@echo ""
+	@echo "Then try:"
+	@echo "  ask list all files"
+	@echo "  ask show disk usage"
 
 # Uninstall from system
 uninstall:
 	@echo "Uninstalling $(BINARY_NAME)..."
 	@sudo rm -f $(INSTALL_PATH)/$(BINARY_NAME)
+	@sudo rm -f /etc/profile.d/cli-assistant.sh
 	@echo "✓ Uninstalled"
 	@echo ""
 	@echo "Note: User data in ~/.cli-assistant is preserved"

@@ -17,10 +17,15 @@ mkdir -p "$BUILD_DIR/DEBIAN"
 mkdir -p "$BUILD_DIR/usr/local/bin"
 mkdir -p "$BUILD_DIR/usr/share/doc/$PKG_NAME"
 mkdir -p "$BUILD_DIR/usr/share/$PKG_NAME"
+mkdir -p "$BUILD_DIR/etc/profile.d"
 
 # Build the application
 echo "Compiling application..."
 go build -o "$BUILD_DIR/usr/local/bin/cli-assistant" ./cmd/cli-assistant
+
+# Copy shell integration to /etc/profile.d (loads for all users)
+echo "Adding shell integration..."
+cp shell-integration.sh "$BUILD_DIR/etc/profile.d/cli-assistant.sh"
 
 # Create control file
 cat > "$BUILD_DIR/DEBIAN/control" << EOF
@@ -49,15 +54,27 @@ echo "Setting up CLI Command Assistant..."
 # Make binary executable
 chmod +x /usr/local/bin/cli-assistant
 
+# Make shell integration executable
+chmod +x /etc/profile.d/cli-assistant.sh
+
 echo ""
-echo "CLI Command Assistant installed successfully!"
+echo "✓ CLI Command Assistant installed successfully!"
 echo ""
 echo "To get started:"
-echo "  1. Run: cli-assistant"
-echo "  2. Follow the setup prompts"
+echo "  1. Reload your shell: source ~/.bashrc"
+echo "  2. Use the ask command: ask list all files"
+echo "  3. Or run interactively: cli-assistant"
 echo ""
-echo "For OpenAI API setup, see:"
-echo "  /usr/share/doc/cli-command-assistant/OPENAI_SETUP.md"
+echo "Shell Integration:"
+echo "  The 'ask' command is now available in your terminal!"
+echo "  Examples:"
+echo "    ask find large files"
+echo "    ask show disk usage"
+echo "    ask search for text in files"
+echo ""
+echo "For OpenAI API setup:"
+echo "  Run: cli-assistant"
+echo "  Or edit: ~/.cli-assistant/config.yaml"
 echo ""
 
 exit 0
@@ -80,8 +97,12 @@ chmod 755 "$BUILD_DIR/DEBIAN/prerm"
 
 # Copy documentation
 cp README.md "$BUILD_DIR/usr/share/doc/$PKG_NAME/"
-cp QUICKSTART.md "$BUILD_DIR/usr/share/doc/$PKG_NAME/"
-cp docs/OPENAI_SETUP.md "$BUILD_DIR/usr/share/doc/$PKG_NAME/"
+if [ -f "QUICKSTART.md" ]; then
+    cp QUICKSTART.md "$BUILD_DIR/usr/share/doc/$PKG_NAME/"
+fi
+if [ -f "docs/OPENAI_SETUP.md" ]; then
+    cp docs/OPENAI_SETUP.md "$BUILD_DIR/usr/share/doc/$PKG_NAME/"
+fi
 cp config.example.yaml "$BUILD_DIR/usr/share/$PKG_NAME/"
 
 # Create copyright file
